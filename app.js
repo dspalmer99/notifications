@@ -36,7 +36,11 @@ function createTables(db) {
                 source text not null,
                 data text not null
             );
-        `);
+        `, (error) => {
+            if (error) {
+                console.log(error);
+            }
+        });
     });
 }
 
@@ -66,7 +70,7 @@ app.post("/notifications", function (request, response) {
 app.get('/notifications', async function (request, response) {
     const output = await new Promise((resolve, reject)=>{
         notificationsDB.serialize(function() {
-            notificationsDB.all("SELECT timestamp, source, data FROM notifications",[],(error, rows)=>{
+            notificationsDB.all("SELECT timestamp, source, data FROM notifications ORDER BY timestamp desc",[],(error, rows)=>{
                 if(error) {
                     console.log(error);
                 } else {
@@ -79,6 +83,7 @@ app.get('/notifications', async function (request, response) {
         });
     });
 
+    response.set('Access-Control-Allow-Origin', '*');
     response.contentType('application/json');
     response.send(JSON.stringify(output));
 });
