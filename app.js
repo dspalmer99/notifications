@@ -3,34 +3,21 @@ const express = require("express");
 
 
 // Connect to the db, creating it if it does not exist
-const notificationsDB = new sqlite3.Database("./notifications.db", sqlite3.OPEN_READWRITE, (error) => {
-    if (error && error.code == "SQLITE_CANTOPEN") {
-        createDatabase();
-        return;
-    } else if (error) {
+const notificationsDB = new sqlite3.Database("./notifications.db", sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (error) => {
+    if (error) {
         console.log("Getting error " + err);
         exit(1);
     }
 });
+// Create the notifications table, if it does not exist
+createTables(notificationsDB);
 
-// Create the db
-function createDatabase() {
-    console.log("Creating sqlite db.");
-    var newdb = new sqlite3.Database('notifications.db', (error) => {
-        if (error) {
-            console.log("Getting error " + error);
-            exit(1);
-        }
-        createTables(newdb);
-    });
-}
-
-// Create the notifications table in the db
+// Helper function for creating the notifications table in the db
 function createTables(db) {
     console.log("Creating notifications table.");
     db.serialize(function() {
         db.exec(`
-            CREATE TABLE notifications (
+            CREATE TABLE IF NOT EXISTS notifications (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 source text not null,
