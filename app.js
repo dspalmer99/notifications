@@ -20,8 +20,10 @@ function createTables(db) {
             CREATE TABLE IF NOT EXISTS notifications (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                source text not null,
-                data text not null
+                source TEXT NOT NULL,
+                type TEXT NOT NULL,
+                version INT NOT NULL,
+                data TEXT NOT NULL
             );
         `, (error) => {
             if (error) {
@@ -38,16 +40,20 @@ app.use(express.json());
 // Post notification endpoint
 app.post("/notifications", function (request, response) {
     const source = request.body.source;
+    const type = request.body.type;
+    const version = request.body.version;
     const data = JSON.stringify(request.body.data);
 
     const statement = notificationsDB.prepare(`
-        INSERT INTO notifications (source, data) 
+        INSERT INTO notifications (source,type, version, data) 
         VALUES (
+            ?,
+            ?,
             ?,
             ?
         )
     `);
-    statement.run(source, data);
+    statement.run(source, type, version, data);
     statement.finalize();
 
     response.send(request.body);
@@ -57,7 +63,7 @@ app.post("/notifications", function (request, response) {
 app.get('/notifications', async function (request, response) {
     const output = await new Promise((resolve, reject)=>{
         notificationsDB.serialize(function() {
-            notificationsDB.all("SELECT timestamp, source, data FROM notifications ORDER BY timestamp desc",[],(error, rows)=>{
+            notificationsDB.all("SELECT timestamp, source, type, version, data FROM notifications ORDER BY timestamp desc",[],(error, rows)=>{
                 if(error) {
                     console.log(error);
                 } else {
