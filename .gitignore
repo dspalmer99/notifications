@@ -1,0 +1,32 @@
+# back end
+# db
+notifications.db
+
+# Dependencies
+node_modules
+
+# front end
+# dependencies
+notifications-ui/node_modules
+notifications-ui/.pnp
+notifications-ui.pnp.js
+
+# testing
+notifications-ui/coverage
+
+# production
+notifications-ui/build
+
+# misc
+notifications-ui/.DS_Store
+notifications-ui/.env.local
+notifications-ui.env.development.local
+notifications-ui/.env.test.local
+notifications-ui/.env.production.local
+notifications-ui/npm-debug.log*
+notifications-ui/yarn-debug.log*
+notifications-ui/yarn-error.log*
+notifications-ui/README.md
+
+# Dependencies
+notifications-ui/node_modules
